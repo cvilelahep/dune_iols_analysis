@@ -24,17 +24,6 @@ with open("/eos/user/c/cristova/DUNE_DAQ/test_2d.csv", "w") as f_out:
     csv_out = csv.writer(f_out, delimiter = ",")
 
     for key in keys:
-
-        # Trigger number
-#        if key[1] != 349: 
-#            continue
-        # Run number
-#        if key[0] != 29226:
-#            continue
-
-        # Only APA 02
-#        if "02" not in d["detw_kHD_TPC_kWIBEth"]["apa"][key]:
-#            continue
         
         # Channel number range
         if key[4] < 6800:
@@ -42,7 +31,6 @@ with open("/eos/user/c/cristova/DUNE_DAQ/test_2d.csv", "w") as f_out:
         if key[4] > 8000:
             continue
 
-        
         # Only collection plane
         if planes[key] != 2:
             continue
@@ -54,15 +42,38 @@ with open("/eos/user/c/cristova/DUNE_DAQ/test_2d.csv", "w") as f_out:
         csv_out.writerow(median_subtracted_adcs)
 
 plt.figure()
-plt.imshow(list(map(list, zip(*test_2d))), vmin = -15000, vmax = 15000, aspect = "auto", interpolation = "none", origin = "lower")
+plt.imshow(list(map(list, zip(*test_2d))), vmin = -15000, vmax = 15000, aspect = "auto", interpolation = "none", origin = "lower", cmap = "plasma")
 plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
 plt.xlabel("Channel number")
 plt.colorbar()
+plt.tight_layout()
 plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d.pdf")
 
 plt.figure()
-plt.imshow(list(map(list, zip(*test_2d))), vmin = -200, vmax = 200, aspect = "auto", interpolation = "none", origin = "lower")
+plt.imshow(list(map(list, zip(*test_2d))), vmin = -200, vmax = 200, aspect = "auto", interpolation = "none", origin = "lower", cmap = "plasma")
 plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
 plt.xlabel("Channel number")
 plt.colorbar()
+plt.tight_layout()
 plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d_max200.pdf")
+
+import numpy as np
+plt.figure()
+adcs_array = np.array(list(map(list, zip(*test_2d))))
+plt.plot(range(len(test_2d)), np.sum(adcs_array, axis = 0))
+plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
+plt.xlabel("Channel number")
+plt.ylabel("ADC integral")
+plt.tight_layout()
+plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_wire_integral.pdf")
+plt.figure()
+
+adcs_array = np.array(list(map(list, zip(*test_2d))))
+plt.plot(range(len(test_2d)), np.max(adcs_array, axis = 0))
+plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
+plt.xlabel("Channel number")
+plt.ylabel("ADC maximum")
+plt.tight_layout()
+plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_wire_maximum.pdf")
+
+         
