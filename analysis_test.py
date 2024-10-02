@@ -19,37 +19,50 @@ import matplotlib.pyplot as plt
 import csv
 
 test_2d = []
+chan_number = []
 with open("/eos/user/c/cristova/DUNE_DAQ/test_2d.csv", "w") as f_out:
     csv_out = csv.writer(f_out, delimiter = ",")
 
     for key in keys:
 
         # Trigger number
-        if key[1] != 349: 
-            continue
+#        if key[1] != 349: 
+#            continue
         # Run number
-        if key[0] != 29226:
+#        if key[0] != 29226:
+#            continue
+
+        # Only APA 02
+#        if "02" not in d["detw_kHD_TPC_kWIBEth"]["apa"][key]:
+#            continue
+        
+        # Channel number range
+        if key[4] < 6800:
             continue
+        if key[4] > 8000:
+            continue
+
+        
+        # Only collection plane
         if planes[key] != 2:
             continue
 
         median_subtracted_adcs = adcs[key] - medians[key]
         
         test_2d.append(median_subtracted_adcs)
+        chan_number.append(key[4])
         csv_out.writerow(median_subtracted_adcs)
 
 plt.figure()
-plt.imshow(test_2d, vmin = -200, vmax = 200)
+plt.imshow(list(map(list, zip(*test_2d))), vmin = -15000, vmax = 15000, aspect = "auto", interpolation = "none", origin = "lower")
+plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
+plt.xlabel("Channel number")
 plt.colorbar()
-plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d.png")
+plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d.pdf")
 
-#import ROOT
-#h_out = ROOT.TH2D("test_event", "test_event", len(test_2d), 0, len(test_2d), len(test_2d[0]), 0, len(test_2d[0]))
-#
-#for i in range(len(test_2d)):
-#    for j in range(len(test_2d[0])):
-#        h_out.SetBinContent(i+1, j+1, test_2d[i][j])
-#
-#f_out = ROOT.TFile("/eos/user/c/cristova/DUNE_DAQ/test_2d.root")
-#h_out.Write()
-#f_out.Close()
+plt.figure()
+plt.imshow(list(map(list, zip(*test_2d))), vmin = -200, vmax = 200, aspect = "auto", interpolation = "none", origin = "lower")
+plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
+plt.xlabel("Channel number")
+plt.colorbar()
+plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d_max200.pdf")
