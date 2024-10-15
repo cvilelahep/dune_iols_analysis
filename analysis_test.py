@@ -66,8 +66,8 @@ plt.xlabel("Channel number")
 plt.ylabel("ADC integral")
 plt.tight_layout()
 plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_wire_integral.pdf")
-plt.figure()
 
+plt.figure()
 adcs_array = np.array(list(map(list, zip(*test_2d))))
 plt.plot(range(len(test_2d)), np.max(adcs_array, axis = 0))
 plt.xticks(ticks = range(0, len(test_2d), 200), labels = chan_number[::200], rotation = 45)
@@ -76,4 +76,24 @@ plt.ylabel("ADC maximum")
 plt.tight_layout()
 plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_wire_maximum.pdf")
 
-         
+plt.figure()
+
+wire_indices = [637, 650, 700, 750, 800, 830, 850]
+plt.figure()
+
+for w_i in wire_indices:
+    plt.plot(range(len(test_2d[0]))[1750:3000], test_2d[w_i][1750:3000], label = chan_number[w_i])
+plt.legend()
+plt.xlabel("Time")
+plt.ylabel("ADC counts")
+plt.tight_layout()
+plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_wire_traces.pdf")
+
+
+# Ratio of muon to laser
+
+laser_max = max(test_2d[700][2000:2200])
+print("Laser peak: {}".format(laser_max))
+muon_max = max(test_2d[700][1800:2000])
+print("Muon peak: {}".format(muon_max))
+print("Ratio: {}".format(laser_max/muon_max))
