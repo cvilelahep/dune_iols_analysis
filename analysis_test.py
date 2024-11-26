@@ -17,6 +17,7 @@ keys = keys["adcs"].keys()
 
 import matplotlib.pyplot as plt
 import csv
+import numpy as np
 
 test_2d = []
 chan_number = []
@@ -34,7 +35,7 @@ with open("/eos/user/c/cristova/DUNE_DAQ/test_2d.csv", "w") as f_out:
         # Only collection plane
         if planes[key] != 2:
             continue
-
+        
         median_subtracted_adcs = adcs[key] - medians[key]
         
         test_2d.append(median_subtracted_adcs)
@@ -57,7 +58,7 @@ plt.colorbar()
 plt.tight_layout()
 plt.savefig("/eos/user/c/cristova/DUNE_DAQ/test_2d_max200.pdf")
 
-import numpy as np
+
 plt.figure()
 adcs_array = np.array(list(map(list, zip(*test_2d))))
 plt.plot(range(len(test_2d)), np.sum(adcs_array, axis = 0))
@@ -97,3 +98,4 @@ print("Laser peak: {}".format(laser_max))
 muon_max = max(test_2d[700][1800:2000])
 print("Muon peak: {}".format(muon_max))
 print("Ratio: {}".format(laser_max/muon_max))
+
