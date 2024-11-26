@@ -9,8 +9,15 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("filename")
 parser.add_argument("output_file_dir")
+parser.add_argument("--force", action="store_true")
 
 args = parser.parse_args()
+
+
+if not args.force:
+    if Path(args.output_file_dir + Path(args.filename).stem + ".root").is_file():
+        print("Output exists. Use --force to overwrite")
+        exit(0)
 
 f_out = ROOT.TFile(args.output_file_dir + Path(args.filename).stem + ".root", "RECREATE")
 
