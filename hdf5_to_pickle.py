@@ -71,9 +71,8 @@ with bz2.BZ2File(args.output_file_dir + Path(args.filename).stem + ".pkl.bz2", "
                 if args.wire_downsample != 1:
                     if rows%args.wire_downsample:
                         data_to_save[record][this_apa][this_plane] = data_to_save[record][this_apa][this_plane][:-(rows%args.wire_downsample)]
-                        data_to_save[record][this_apa][this_plane] = np.mean(np.concatenate(data_to_save[record][this_apa][this_plane]).reshape(int(rows/args.wire_downsample), args.wire_downsample, -1), axis = 1)
+                    data_to_save[record][this_apa][this_plane] = np.mean(np.concatenate(data_to_save[record][this_apa][this_plane]).reshape(int(rows/args.wire_downsample), args.wire_downsample, -1), axis = 1)
                 else:
                     data_to_save[record][this_apa][this_plane] = np.concatenate(data_to_save[record][this_apa][this_plane]).reshape(rows, -1)
-                print(data_to_save[record][this_apa][this_plane].shape)
 
         pickle.dump(data_to_save, f_out)
