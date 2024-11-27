@@ -1,6 +1,6 @@
-### DUNE IoLS analysis tools
+# DUNE IoLS analysis tools
 
-# hdf5_to_pickle.py
+## hdf5_to_pickle.py
 Extracts data from the raw HDF5 files using the `dqmtools` `dataframe_creator`. No `ROOT` dependence, to avoid interference with the DUNE-DAQ environment.
 Options to reduce the file size by downsampling the waveform or wires. This is done by averaging over N ticks/wires.
 ```
@@ -21,7 +21,7 @@ options:
   --force               Overwrite output file
 ```
 
-# pickle_to_th2.py
+## pickle_to_th2.py
 Converts the data in the pickle files above to `ROOT` `TH2D`s. No dependence on DUNE-DAQ libraries, only `pyROOT` and python standard libraries.
 
 ```
