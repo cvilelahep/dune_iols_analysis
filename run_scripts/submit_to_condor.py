@@ -51,10 +51,10 @@ with open(args.hdf5_list_filename, "r") as f:
                              "dunedaq_work_area": args.dunedaq_work_area,
                              "APA": args.APA,
                              "planes": args.planes,
-                             "wire_downsample": args.wire_downsample,
-                             "waveform_downsample": args.waveform_downsample,
-                             "force": args.force,
-                             "python_script_dir": python_script_dir})
+                             "wire_downsample": str(args.wire_downsample),
+                             "waveform_downsample": str(args.waveform_downsample),
+                             "force": str(args.force),
+                             "python_script_dir": str(python_script_dir)})
         else:
             this_str += ","
 
@@ -71,15 +71,13 @@ dune_iols_ana_job = htcondor.Submit({
     'log': log_dir_log+'/dune_iols_ana_job_$(ProcId).log',
     'request_CPUs': '1',
     'should_transfer_files': 'NO',
-    '+JobFlavour': args.job_flavour,
+    '+JobFlavour': '"'+args.job_flavour+'"',
     'MY.SendCredential': True,
     'requirements': '(OpSysAndVer =?= \"AlmaLinux9\")'})
 
-print(dune_iols_ana_job)
-
 schedd = htcondor.Schedd()
 if not args.dry:
-    submit_result = schedd.submit(dune_iols_ana_job, itemdata = itemdata)
+    submit_result = schedd.submit(dune_iols_ana_job, itemdata = iter(itemdata))
     print(submit_result.cluster())
 else:
     print("DRY RUN")
