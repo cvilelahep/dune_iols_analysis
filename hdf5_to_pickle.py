@@ -16,7 +16,7 @@ parser.add_argument("--APA", type=str, help="Comma-separated list of APAs", defa
 parser.add_argument("--planes", type=str, help="Comma-separated list of planes", default="0,1,2")
 parser.add_argument("--wire_downsample", type=int, help="Downsampling factor for wires", default=1)
 parser.add_argument("--waveform_downsample", type=int, help="Downsampling factor for the waveform", default=1)
-parser.add_argument("--force", action="store_true")
+parser.add_argument("--force", action="store_true", help="Overwrite output file")
 
 args = parser.parse_args()
 
