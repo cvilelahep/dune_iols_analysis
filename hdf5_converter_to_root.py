@@ -6,6 +6,48 @@ from tqdm import tqdm
 import dqmtools.dataframe_creator as dfc
 import numpy as np
 
+def adjust_wire_numbering(hist, apa, plane, keys, adcs, medians, args):
+    wire_start = 0
+    wire_end = 0
+    
+    if apa == "APA_P02SU":
+        if plane == 0:
+            wire_start, wire_end = 0, 799
+        elif plane == 1:
+            wire_start, wire_end = 800, 1599
+        elif plane == 2:
+            wire_start, wire_end = 1600, 2559
+    elif apa == "APA_P01SU":
+        if plane == 0:
+            wire_start, wire_end = 5120, 5919
+        elif plane == 1:
+            wire_start, wire_end = 5920, 6719
+        elif plane == 2:
+            wire_start, wire_end = 6719, 7679
+
+    N_wires = wire_end - wire_start + 1
+    N_Y = len(adcs[keys[0]])
+
+    # Create a new histogram with correct wire numbering
+    new_hist = ROOT.TH2D(f"{hist.GetName()}_adjusted", f"{hist.GetTitle()};Wire;Time",
+                         N_wires, wire_start, wire_end + 1, N_Y, 0, N_Y)
+
+    for i, key in enumerate(keys):
+        if key in adcs:
+            median_subtracted_adcs = adcs[key] - medians[key]
+
+            # Apply waveform downsampling if necessary
+            if args.waveform_downsample != 1:
+                median_subtracted_adcs = np.mean(median_subtracted_adcs.reshape(-1, args.waveform_downsample), axis=1)
+
+            # Fill the histogram with correct wire numbering
+            wire_number = wire_start + i
+            if wire_start <= wire_number <= wire_end:
+                for j, adc_value in enumerate(median_subtracted_adcs):
+                    new_hist.SetBinContent(wire_number - wire_start + 1, j + 1, adc_value)
+
+    return new_hist
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("filename")
@@ -74,25 +116,10 @@ for f_name in files:
                     
                     hist_name = f"record_{record}_apa_{apa}_plane_{plane}"
                     hist_title = ";Wire;Time"
-                    hist = ROOT.TH2D(hist_name, hist_title, N_X, 0, N_X, N_Y, 0, N_Y)
+                    temp_hist = ROOT.TH2D(hist_name, hist_title, N_X, 0, N_X, N_Y, 0, N_Y)
 
-                    for i, key in enumerate(keys):
-                        if key in apas and key in planes and apas[key] == apa and planes[key] == plane:
-                            median_substracted_adcs = adcs[key] - medians[key]
-                            
-                            # Apply waveform downsampling
-                            if args.waveform_downsample != 1:
-                                median_substracted_adcs = np.mean(median_substracted_adcs.reshape(-1, args.waveform_downsample), axis=1)
-                            
-                            # Apply wire downsampling
-                            if args.wire_downsample != 1 and i % args.wire_downsample == 0:
-                                for j in range(N_Y):
-                                    hist.SetBinContent(i // args.wire_downsample + 1, j + 1, median_substracted_adcs[j])
-                            elif args.wire_downsample == 1:
-                                for j in range(N_Y):
-                                    hist.SetBinContent(i + 1, j + 1, median_substracted_adcs[j])
-
-                    hist.Write()
+                    adjusted_hist = adjust_wire_numbering(temp_hist, apa, int(plane), keys, adcs, medians, args)
+                    adjusted_hist.Write()
 
 print("Processing completed.")
 
